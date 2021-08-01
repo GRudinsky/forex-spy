@@ -1,0 +1,17 @@
+@import '../../styles/colors';
+
+.mainWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  background: $color-background;
+
+  .gridWrapper {
+    width: 100%;
+    display: inline-grid;
+    column-gap: 2vmin;
+    row-gap: 2vmin;
+    grid-template-columns: 24% 24% 24% 24%;
+  }
+}

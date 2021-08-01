@@ -1,0 +1,13 @@
+@import '../../styles/colors';
+
+.gridWrapper {
+  width: 100%;
+  display: inline-grid;
+  column-gap: 2vmin;
+  row-gap: 2vmin;
+  grid-template-columns: 24% 24% 24% 24%;
+
+  &__item {
+    height: 30vmin;
+  }
+}

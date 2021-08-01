@@ -1,0 +1,17 @@
+@import '../../styles/colors';
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 8vh;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  background: $color-white;
+  border-bottom: 2px solid $color-border;
+  z-index: 999;
+
+  &__content {
+    padding: 0 10vmin;
+  }
+}
