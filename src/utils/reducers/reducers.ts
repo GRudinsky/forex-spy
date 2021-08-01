@@ -1,6 +1,11 @@
 import {
   GlobalStateInterface,
-  AllCurrenciesInterface
+  AllCurrenciesInterface,
+  AllCurrenciesStateInterface,
+  ChosenRateStateInterface,
+  FavouriteCurrenciesType,
+  ChosenRateType,
+  ErrorType
 } from '../../state/GlobalStateProvider';
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -18,24 +23,30 @@ export enum ActionTypes {
   AddCurrency = 'ADD_FAVOURITE_CURRENCY',
   RemoveCurrency = 'REMOVE_FAVOURITE_CURRENCY',
   GetRates = 'GET_ALL_CURRENCY_RATES',
+  GetRatesSuccess = 'GET_ALL_CURRENCY_RATES_SUCCESS',
+  GetRatesFailure = 'GET_ALL_CURRENCY_RATES_FAILURE',
   ResetRates = 'RESET_ALL_CURRENCY_RATES',
   GetHistory = 'GET_CHOSEN_CURRENCY_RATE_HISTORY',
+  GetHistorySuccess = 'GET_CHOSEN_CURRENCY_RATE_HISTORY_SUCCESS',
+  GetHistoryFailure = 'GET_CHOSEN_CURRENCY_RATE_HISTORY_FAILURE',
   ResetHistory = 'RESET_CURRENCY_RATE_HISTORY'
 }
 
-type Currency = string;
-
 type CurrencyTypePayload = {
-  [ActionTypes.AddCurrency]: Currency;
-  [ActionTypes.RemoveCurrency]: Currency;
+  [ActionTypes.AddCurrency]: string;
+  [ActionTypes.RemoveCurrency]: string;
 };
+
+const logActionType = (action: ActionTypes) =>
+  console.log(`%c action ${action} `, 'font-weight: bold');
 
 export type FavouriteCurrenciesActions = ActionMap<CurrencyTypePayload>[keyof ActionMap<CurrencyTypePayload>];
 
 const favouriteCurrenciesReducer = (
-  state: Currency[],
+  state: FavouriteCurrenciesType,
   action: FavouriteCurrenciesActions
 ) => {
+  logActionType(action.type);
   switch (action.type) {
     case ActionTypes.AddCurrency:
       return [...state, action.payload];
@@ -46,43 +57,87 @@ const favouriteCurrenciesReducer = (
   }
 };
 
-type AllratesPayload = {
-  [ActionTypes.GetRates]: AllCurrenciesInterface;
+type AllRatesPayload = {
+  [ActionTypes.GetRates]: {
+    body: AllCurrenciesInterface;
+    error: ErrorType;
+  };
   [ActionTypes.ResetRates]: undefined;
 };
 
-export type AllCurrencyRatesActions = ActionMap<AllratesPayload>[keyof ActionMap<AllratesPayload>];
+export type AllCurrencyRatesActions = ActionMap<AllRatesPayload>[keyof ActionMap<AllRatesPayload>];
 
 const allCurrencyRatesReducer = (
-  state: AllCurrenciesInterface | null,
+  state: AllCurrenciesStateInterface,
   action: AllCurrencyRatesActions
 ) => {
   switch (action.type) {
     case ActionTypes.GetRates:
-      return action.payload;
+      const { body, error } = action.payload;
+      if (body) {
+        logActionType(ActionTypes.GetRatesSuccess);
+        return {
+          body,
+          error: null
+        };
+      }
+      if (error) {
+        logActionType(ActionTypes.GetRatesFailure);
+        return {
+          body: null,
+          error
+        };
+      }
+      return state;
+
     case ActionTypes.ResetRates:
-      return null;
+      logActionType(ActionTypes.ResetRates);
+      return {
+        body: null,
+        error: null
+      };
     default:
       return state;
   }
 };
 
 type RateHistoryPayload = {
-  [ActionTypes.GetHistory]: {};
+  [ActionTypes.GetHistory]: {
+    body: ChosenRateType;
+    error: ErrorType;
+  };
   [ActionTypes.ResetHistory]: undefined;
 };
 
 export type ChosenRateHistoryActions = ActionMap<RateHistoryPayload>[keyof ActionMap<RateHistoryPayload>];
 
 const chosenRateHistoryReducer = (
-  state: object | null,
+  state: ChosenRateStateInterface,
   action: ChosenRateHistoryActions
 ) => {
   switch (action.type) {
     case ActionTypes.GetHistory:
-      return action.payload; //will need currency name in payload
+      const { body, error } = action.payload;
+      if (body) {
+        logActionType(ActionTypes.GetHistorySuccess);
+        return {
+          body,
+          error: null
+        };
+      }
+      if (error) {
+        logActionType(ActionTypes.GetHistoryFailure);
+        return {
+          body: null,
+          error
+        };
+      }
+      return state;
     case ActionTypes.ResetHistory:
-      return null;
+      return {
+        body: null,
+        error: null
+      };
     default:
       return state;
   }

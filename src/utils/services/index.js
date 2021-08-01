@@ -1,2 +1,2 @@
-import { list } from './list';
-export { list };
+import { getCurrencies } from './services';
+export { getCurrencies };

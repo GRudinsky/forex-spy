@@ -1,46 +1,48 @@
 import React, { useState, useEffect, useContext, Suspense } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { GlobalStateContext } from '../../state/GlobalStateProvider';
-
-import { URL_OXR, ERROR_MESSAGE_LIST } from '../../utils/constants';
+import { GlobalStateContext, RatesType } from '../../state/GlobalStateProvider';
+import { ActionTypes } from '../../utils/reducers';
+import { getCurrencies } from '../../utils/services';
 import './CurrencyGrid.scss';
 
 const CurrencyCard = React.lazy(() => import('../../components/CurrencyCard'));
 
-type dataType = {
-  rates: { [key: string]: number };
-};
-
 const CurrencyGrid = () => {
   const {
-    state: { favouriteCurrencies },
+    state: { allCurrencyRates, favouriteCurrencies },
     dispatch
   } = useContext(GlobalStateContext);
 
   let history = useHistory();
-  const [data, setData] = useState<dataType>({
-    rates: {
-      AED: 1,
-      BGD: 2,
-      CBV: 3
-    }
-  });
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { error } = allCurrencyRates;
 
   useEffect(() => {
     setLoading(true);
-    getProducts();
+    listCurrencies();
   }, []);
 
-  const getProducts = async () => {
-    // try {
-    //   const response = await list(URL_OXR);
-    //   setData(response);
-    // } catch (e) {
-    //   setError(ERROR_MESSAGE_LIST);
-    // }
+  useEffect(() => {
+    allCurrencyRates.body && setData(allCurrencyRates.body.rates);
+  }, [allCurrencyRates.body]);
+
+  const listCurrencies = () => {
+    getCurrencies()
+      .then((res) => {
+        dispatch({
+          type: ActionTypes.GetRates,
+          payload: { body: res, error: null }
+        });
+      })
+      .catch((e) =>
+        dispatch({
+          type: ActionTypes.GetRates,
+          payload: { body: null, error: e.message }
+        })
+      );
+
     setLoading(false);
   };
 
@@ -49,18 +51,17 @@ const CurrencyGrid = () => {
       pathname: `/${e.currentTarget.title}`
     });
   };
-  console.log('FAV', favouriteCurrencies);
-  const { rates } = data;
 
-  const sortedCurrencies =
-    rates && favouriteCurrencies
-      ? Object.keys(rates).reduce((acc: string[], item) => {
+  const sortedCurrencies = () => {
+    return data && favouriteCurrencies
+      ? Object.keys(data).reduce((acc: string[], item) => {
           acc = favouriteCurrencies.includes(item)
             ? [item, ...acc]
             : [...acc, item];
           return acc;
         }, [])
       : [];
+  };
 
   return (
     <>
@@ -69,14 +70,14 @@ const CurrencyGrid = () => {
         {error && <h2 id="errorMessage">{error}</h2>}
         {!loading && !error && (
           <div className="gridWrapper">
-            {sortedCurrencies.map((item: string, idx) => {
+            {sortedCurrencies().map((item: string, idx) => {
               return (
                 <div className="gridWrapper__item" key={item}>
                   <Suspense fallback={<div>Loading...</div>}>
                     <CurrencyCard
                       data={{
                         currency: item,
-                        value: rates[item]
+                        value: data[item]
                       }}
                       clickHandler={openCard}
                     />

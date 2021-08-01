@@ -5,11 +5,9 @@ import './CurrencyPage.scss';
 const CurrencyPage = () => {
   const params = useParams();
 
-  //call fetch curr history with params.id
-
   return (
     <div className="container">
-      <h1>Hello {params.id}</h1>
+      <h1>{params.id + ' page'}</h1>
     </div>
   );
 };

@@ -47,7 +47,9 @@ const CurrencyCard = ({ data, clickHandler }: Props) => {
         </div>
         <div className="card__action" title={currency} onClick={clickHandler}>
           <div className="card__action__name">{currency}</div>
-          <div className="card__action__price">{`$${value} `}</div>
+          <div className="card__action__price">{`$${(1 / value).toFixed(
+            4
+          )} `}</div>
         </div>
       </div>
     )

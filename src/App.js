@@ -13,7 +13,7 @@ function App() {
           <Route path="/:id">
             <CurrencyPage />
           </Route>
-          <Route path="/">
+          <Route exact path="/">
             <CurrencyGrid />
           </Route>
         </GlobalStateProvider>
