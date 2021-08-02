@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext } from 'react';
+import React, { useReducer, useContext } from 'react';
 import { mainReducer } from '../utils/reducers';
 
 export type RatesType = {

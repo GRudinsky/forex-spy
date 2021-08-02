@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useGlobalContext, RatesType } from '../../state/GlobalStateProvider';
+import { useGlobalContext } from '../../state/GlobalStateProvider';
 import { ActionTypes } from '../../utils/reducers';
 import { getCurrencies } from '../../utils/services';
 import './CurrencyGrid.scss';
