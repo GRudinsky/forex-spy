@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { GlobalStateContext } from '../../state/GlobalStateProvider';
+import React from 'react';
+import { useGlobalContext } from '../../state/GlobalStateProvider';
 import { ActionTypes } from '../../utils/reducers';
 
 import Lozenge from '@atlaskit/lozenge';
@@ -20,7 +20,7 @@ const CurrencyCard = ({ data, clickHandler }: Props) => {
   const {
     state: { favouriteCurrencies },
     dispatch
-  } = useContext(GlobalStateContext);
+  } = useGlobalContext();
 
   const isChecked = favouriteCurrencies.includes(currency);
 
@@ -30,9 +30,11 @@ const CurrencyCard = ({ data, clickHandler }: Props) => {
       payload: e.target.value
     });
   };
+  const primaryId = `currencyCard_${currency}`;
+
   return (
     favouriteCurrencies && (
-      <div className="card">
+      <div className="card" id={primaryId}>
         <div className="card__favourite">
           <Checkbox
             id={`checkbox__${currency}`}
@@ -45,11 +47,18 @@ const CurrencyCard = ({ data, clickHandler }: Props) => {
           />
           {isChecked && <Lozenge appearance="inprogress">Favourite</Lozenge>}
         </div>
-        <div className="card__action" title={currency} onClick={clickHandler}>
-          <div className="card__action__name">{currency}</div>
-          <div className="card__action__price">{`$${(1 / value).toFixed(
-            4
-          )} `}</div>
+        <div
+          id="card_action"
+          className="card__action"
+          title={currency}
+          onClick={clickHandler}
+        >
+          <div id={`${primaryId}_name`} className="card__action__name">
+            {currency}
+          </div>
+          <div id={`${primaryId}_price`} className="card__action__price">{`$${(
+            1 / value
+          ).toFixed(4)}`}</div>
         </div>
       </div>
     )

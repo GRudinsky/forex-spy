@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { GlobalStateContext, RatesType } from '../../state/GlobalStateProvider';
+import { useGlobalContext, RatesType } from '../../state/GlobalStateProvider';
 import { ActionTypes } from '../../utils/reducers';
 import { getCurrencies } from '../../utils/services';
 import './CurrencyGrid.scss';
@@ -12,7 +12,7 @@ const CurrencyGrid = () => {
   const {
     state: { allCurrencyRates, favouriteCurrencies },
     dispatch
-  } = useContext(GlobalStateContext);
+  } = useGlobalContext();
 
   let history = useHistory();
   const [data, setData] = useState(null);

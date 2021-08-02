@@ -1,62 +1,99 @@
+import React from 'react';
 import { mount } from 'enzyme';
-import ProductCard from './ProductCard';
+import * as GlobalStateContext from '../../state/GlobalStateProvider';
+import CurrencyCard from './CurrencyCard';
 
-describe('<ProductCard />', () => {
-  const product = {
-    productId: 100024698,
-    name: 'Rose Gold Shimmer Clutch Bag',
-    description:
-      '• Shimmer finish\n• Pleat design\n• Magnetic closure\n• Inner pocket\n• Detachable chain strap',
-    price: 9.09,
-    priceWas: 12.99,
-    available: true,
-    quantity: 6,
-    lowOnStock: true,
-    promotionBadge: '30% OFF',
-    imageUrl: 'https://i8.amplience.net/i/Quiz/00100024698_XM?w=1024'
+jest.mock('../../state/GlobalStateProvider');
+
+describe('<CurrencyCard />', () => {
+  const contextMock = {
+    state: { favouriteCurrencies: ['GBP'] },
+    dispatch: jest.fn()
+  };
+
+  const changedContextMock = {
+    ...contextMock,
+    state: {
+      ...contextMock.state,
+      favouriteCurrencies: []
+    }
+  };
+  const data = {
+    currency: 'GBP',
+    value: 0.8
   };
 
   let wrapper;
   const props = {
-    data: product,
-    checkHandler: jest.fn()
+    data,
+    clickHandler: jest.fn()
   };
+
   beforeEach(() => {
-    wrapper = mount(<ProductCard {...props} />);
+    GlobalStateContext.useGlobalContext = jest
+      .fn()
+      .mockImplementation(() => contextMock);
+
+    wrapper = mount(<CurrencyCard {...props} />);
   });
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  it('should display quantity numbers and LOW ON STOCK indicator when lowOnStock in data is true', () => {
-    expect(wrapper.find({ id: 'quantityIndicator' }).text()).toBe('6 in stock');
-    expect(wrapper.find({ id: 'lowStockIndicator' })).toHaveLength(1);
+  it('should display the correct currency name and the formatted rate', () => {
+    const { currency } = data;
+    expect(wrapper.find(`#currencyCard_${currency}_name`).text()).toEqual(
+      currency
+    );
+    expect(wrapper.find(`#currencyCard_${currency}_price`).text()).toEqual(
+      `$1.2500`
+    );
   });
 
-  [{ available: false }, { quantity: 0 }].forEach((item) => {
-    const [key, value] = Object.entries(item)[0];
-    it(`should display Out of stock message and no LOW ON STOCK indicator when data ${key} is ${value}`, () => {
-      const newProps = {
-        ...props,
-        data: {
-          ...props.data,
-          [key]: value
-        }
-      };
-      wrapper.setProps({ ...newProps });
-      wrapper.update();
+  [
+    {
+      context: contextMock,
+      checkBoxChecked: true,
+      lozengeLength: 1,
+      action: 'REMOVE_FAVOURITE_CURRENCY'
+    },
+    {
+      context: changedContextMock,
+      checkBoxChecked: false,
+      lozengeLength: 0,
+      action: 'ADD_FAVOURITE_CURRENCY'
+    }
+  ].forEach((item) => {
+    const { context, checkBoxChecked, lozengeLength, action } = item;
 
-      expect(wrapper.find({ id: 'quantityIndicator' }).text()).toBe(
-        'OUT OF STOCK'
+    it(`should have the checkbox checked value equal to ${checkBoxChecked} and ${lozengeLength} lozenges displayed when currency is ${
+      context.state.favouriteCurrencies.includes(data.currency) ? '' : 'NOT '
+    }within favouriteCurrencies in global state`, () => {
+      jest
+        .spyOn(GlobalStateContext, 'useGlobalContext')
+        .mockImplementationOnce(() => context);
+
+      wrapper = mount(<CurrencyCard {...props} />);
+      expect(wrapper.find('Lozenge')).toHaveLength(lozengeLength);
+      expect(wrapper.find('input[id="checkbox__GBP"]').props().checked).toBe(
+        checkBoxChecked
       );
-      expect(wrapper.find({ id: 'lowStockIndicator' })).toHaveLength(0);
     });
-  });
 
-  it('should call checkHandler on checkBox change', () => {
-    wrapper.find('input[type="checkBox"]').simulate('change', {
-      target: { value: '100024698' }
+    it(`should dispatch ${action} action on checkBox change to ${
+      checkBoxChecked ? 'un' : ''
+    }checked`, () => {
+      jest
+        .spyOn(GlobalStateContext, 'useGlobalContext')
+        .mockImplementationOnce(() => context);
+      wrapper = mount(<CurrencyCard {...props} />);
+      wrapper
+        .find('input[id="checkbox__GBP"]')
+        .simulate('change', { target: { value: 'GBP' } });
+      expect(contextMock.dispatch).toHaveBeenCalledWith({
+        payload: 'GBP',
+        type: action
+      });
     });
-    expect(wrapper.props().checkHandler).toHaveBeenCalledTimes(1);
   });
 });
