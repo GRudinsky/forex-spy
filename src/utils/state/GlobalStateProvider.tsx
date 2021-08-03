@@ -1,5 +1,6 @@
 import React, { useReducer, useContext } from 'react';
-import { mainReducer } from '../utils/reducers';
+import { mainReducer } from '../reducers';
+import { initialState } from './initialState';
 
 export type RatesType = {
   [key: string]: number;
@@ -33,18 +34,6 @@ export interface GlobalStateInterface {
   favouriteCurrencies: string[];
 }
 
-const initialState = {
-  allCurrencyRates: {
-    body: null,
-    error: null
-  },
-  chosenRateHistory: {
-    body: null,
-    error: null
-  },
-  favouriteCurrencies: []
-};
-
 const GlobalStateContext = React.createContext<{
   state: GlobalStateInterface;
   dispatch: React.Dispatch<any>;
@@ -57,7 +46,6 @@ const useGlobalContext = () => useContext(GlobalStateContext);
 
 const GlobalStateProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(mainReducer, initialState);
-
   return (
     <GlobalStateContext.Provider value={{ state, dispatch }}>
       {children}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGlobalContext } from '../../state/GlobalStateProvider';
+import { useGlobalContext } from '../../utils/state';
 import { ActionTypes } from '../../utils/reducers';
 
 import Lozenge from '@atlaskit/lozenge';

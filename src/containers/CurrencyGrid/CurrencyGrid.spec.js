@@ -1,11 +1,10 @@
 import React from 'react';
 import { Router } from 'react-router-dom';
 import { mount } from 'enzyme';
-import * as GlobalStateContext from '../../state/GlobalStateProvider';
+import { GlobalStateContext } from '../../utils/state';
 import * as services from '../../utils/services';
 import CurrencyGrid from './CurrencyGrid';
 
-jest.mock('../../state/GlobalStateProvider');
 jest.mock('../../utils/services');
 describe('CurrencyGrid', () => {
   const contextMock = {
@@ -38,11 +37,14 @@ describe('CurrencyGrid', () => {
 
   describe('With resolved promise', () => {
     beforeEach(() => {
-      GlobalStateContext.useGlobalContext.mockImplementation(() => contextMock);
       services.getCurrencies.mockImplementation(() =>
         Promise.resolve({ data: { rates: { GBP: 1.2 } } })
       );
-      wrapper = mount(<CurrencyGrid />);
+      wrapper = mount(
+        <GlobalStateContext.Provider value={contextMock}>
+          <CurrencyGrid />
+        </GlobalStateContext.Provider>
+      );
     });
 
     afterEach(() => {
@@ -77,9 +79,11 @@ describe('CurrencyGrid', () => {
         Promise.resolve({ data: { rates: { AED: 1.2 } } })
       );
       const wrapper = mount(
-        <Router history={historyMock}>
-          <CurrencyGrid />
-        </Router>
+        <GlobalStateContext.Provider value={contextMock}>
+          <Router history={historyMock}>
+            <CurrencyGrid />
+          </Router>
+        </GlobalStateContext.Provider>
       );
       const card = wrapper.find('CurrencyCard').at(0);
       card.find('#card_action').simulate('click');
@@ -90,13 +94,14 @@ describe('CurrencyGrid', () => {
 
   describe('<With rejected promise/>', () => {
     beforeEach(() => {
-      GlobalStateContext.useGlobalContext.mockImplementation(
-        () => errorContextMock
-      );
       services.getCurrencies.mockImplementation(() =>
         Promise.reject(new Error('some error message'))
       );
-      wrapper = mount(<CurrencyGrid />);
+      wrapper = mount(
+        <GlobalStateContext.Provider value={errorContextMock}>
+          <CurrencyGrid />
+        </GlobalStateContext.Provider>
+      );
     });
 
     afterEach(() => {

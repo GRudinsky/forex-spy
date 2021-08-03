@@ -1,5 +1,5 @@
 import { Route, Switch } from 'react-router-dom';
-import { GlobalStateProvider } from './state/GlobalStateProvider';
+import { GlobalStateProvider } from './utils/state';
 
 import { CurrencyGrid, CurrencyPage } from './containers';
 import { Header } from './components';

@@ -6,7 +6,7 @@ import {
   FavouriteCurrenciesType,
   ChosenRateType,
   ErrorType
-} from '../../state/GlobalStateProvider';
+} from '../state/GlobalStateProvider';
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined
@@ -38,7 +38,7 @@ type CurrencyTypePayload = {
 };
 
 const logActionType = (action: ActionTypes) =>
-  console.log(`%c action ${action} `, 'font-weight: bold');
+  console.log(`%c action ${action}`, 'font-weight: bold');
 
 export type FavouriteCurrenciesActions = ActionMap<CurrencyTypePayload>[keyof ActionMap<CurrencyTypePayload>];
 
@@ -46,11 +46,12 @@ const favouriteCurrenciesReducer = (
   state: FavouriteCurrenciesType,
   action: FavouriteCurrenciesActions
 ) => {
-  logActionType(action.type);
   switch (action.type) {
     case ActionTypes.AddCurrency:
+      logActionType(action.type);
       return [...state, action.payload];
     case ActionTypes.RemoveCurrency:
+      logActionType(action.type);
       return [...state.filter((item) => item !== action.payload)];
     default:
       return state;
@@ -74,13 +75,6 @@ const allCurrencyRatesReducer = (
   switch (action.type) {
     case ActionTypes.GetRates:
       const { body, error } = action.payload;
-      if (body) {
-        logActionType(ActionTypes.GetRatesSuccess);
-        return {
-          body,
-          error: null
-        };
-      }
       if (error) {
         logActionType(ActionTypes.GetRatesFailure);
         return {
@@ -88,8 +82,14 @@ const allCurrencyRatesReducer = (
           error
         };
       }
+      if (body) {
+        logActionType(ActionTypes.GetRatesSuccess);
+        return {
+          body,
+          error: null
+        };
+      }
       return state;
-
     case ActionTypes.ResetRates:
       logActionType(ActionTypes.ResetRates);
       return {
@@ -118,13 +118,6 @@ const chosenRateHistoryReducer = (
   switch (action.type) {
     case ActionTypes.GetHistory:
       const { body, error } = action.payload;
-      if (body) {
-        logActionType(ActionTypes.GetHistorySuccess);
-        return {
-          body,
-          error: null
-        };
-      }
       if (error) {
         logActionType(ActionTypes.GetHistoryFailure);
         return {
@@ -132,8 +125,16 @@ const chosenRateHistoryReducer = (
           error
         };
       }
+      if (body) {
+        logActionType(ActionTypes.GetHistorySuccess);
+        return {
+          body,
+          error: null
+        };
+      }
       return state;
     case ActionTypes.ResetHistory:
+      logActionType(ActionTypes.ResetHistory);
       return {
         body: null,
         error: null

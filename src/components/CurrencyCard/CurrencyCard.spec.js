@@ -1,9 +1,9 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import * as GlobalStateContext from '../../state/GlobalStateProvider';
+import * as GlobalStateContext from '../../utils/state';
 import CurrencyCard from './CurrencyCard';
 
-jest.mock('../../state/GlobalStateProvider');
+jest.mock('../../utils/state');
 
 describe('<CurrencyCard />', () => {
   const contextMock = {
