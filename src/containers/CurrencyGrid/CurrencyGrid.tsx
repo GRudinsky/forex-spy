@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { useGlobalContext } from '../../utils/state';
 import { ActionTypes } from '../../utils/reducers';
 import { getCurrencies } from '../../utils/services';
+import { MultilineInput } from 'react-input-multiline';
 import './CurrencyGrid.scss';
 
 const CurrencyCard = React.lazy(() => import('../../components/CurrencyCard'));
@@ -16,6 +17,7 @@ const CurrencyGrid = () => {
 
   let history = useHistory();
   const [data, setData] = useState(null);
+  const [searchString, setSearchString] = useState('');
   const [loading, setLoading] = useState(false);
   const { error } = allCurrencyRates;
 
@@ -53,14 +55,21 @@ const CurrencyGrid = () => {
   };
 
   const sortedCurrencies = () => {
-    return data && favouriteCurrencies
-      ? Object.keys(data).reduce((acc: string[], item) => {
-          acc = favouriteCurrencies.includes(item)
-            ? [item, ...acc]
-            : [...acc, item];
-          return acc;
-        }, [])
-      : [];
+    if (data) {
+      const currencies = Object.keys(data);
+      const filteredCurrencies = !searchString
+        ? currencies
+        : currencies.filter((item) =>
+            item.includes(searchString.toUpperCase())
+          );
+      return filteredCurrencies.reduce((acc: string[], item) => {
+        acc = favouriteCurrencies.includes(item)
+          ? [item, ...acc]
+          : [...acc, item];
+        return acc;
+      }, []);
+    }
+    return [];
   };
 
   return (
@@ -69,23 +78,31 @@ const CurrencyGrid = () => {
         {loading && <h2 id="loadingMessage">Loading...</h2>}
         {error && <h2 id="errorMessage">{error}</h2>}
         {!loading && !error && (
-          <div className="gridWrapper">
-            {sortedCurrencies().map((item: string, idx) => {
-              return (
-                <div className="gridWrapper__item" key={item}>
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <CurrencyCard
-                      data={{
-                        currency: item,
-                        value: data[item]
-                      }}
-                      clickHandler={openCard}
-                    />
-                  </Suspense>
-                </div>
-              );
-            })}
-          </div>
+          <>
+            <MultilineInput
+              id="input"
+              value=""
+              placeholder="search..."
+              onChange={(e) => setSearchString(e.target.value)}
+            />
+            <div className="gridWrapper">
+              {sortedCurrencies().map((item: string, idx) => {
+                return (
+                  <div className="gridWrapper__item" key={item}>
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <CurrencyCard
+                        data={{
+                          currency: item,
+                          value: data[item]
+                        }}
+                        clickHandler={openCard}
+                      />
+                    </Suspense>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </>
